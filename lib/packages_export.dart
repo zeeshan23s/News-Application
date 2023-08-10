@@ -9,3 +9,6 @@ export 'utils/util.dart';
 export 'services/service.dart';
 export 'widgets/widgets.dart';
 export 'models/model.dart';
+
+// API Integration
+export 'package:dio/dio.dart';
