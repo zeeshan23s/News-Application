@@ -1,5 +1,3 @@
-import 'package:news_application/models/news.dart';
-
 import '../packages_export.dart';
 
 class NewsController {
