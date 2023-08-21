@@ -1,14 +1,16 @@
 import '../packages_export.dart';
 
 class NewsController {
-  final dio = Dio();
+  static Future<List<News>> fetchData(String relatedTo) async {
+    Dio dio = Dio();
+    List<News> appNews = [];
 
-  final List<News> appNews = [];
-
-  Future<List<News>> fetchData(String relatedTo) async {
-    final response = await dio.get(relatedTo == 'All'
-        ? 'https://newsapi.org/v2/everything?q=is&apiKey=APIKey&language=en'
-        : 'https://newsapi.org/v2/everything?q=${relatedTo.toLowerCase()}&apiKey=APIKey&language=en');
+    final response =
+        await dio.get('https://newsapi.org/v2/everything', queryParameters: {
+      'q': relatedTo.toLowerCase(),
+      'apiKey': '4fb918f8585943ecb9e32ab3c4f3167b',
+      'language': 'en'
+    });
 
     if (response.statusCode == 200) {
       List<dynamic> data = response.data['articles'];

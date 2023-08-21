@@ -12,3 +12,6 @@ export 'models/model.dart';
 
 // API Integration
 export 'package:dio/dio.dart';
+
+// Providers
+export 'package:provider/provider.dart';

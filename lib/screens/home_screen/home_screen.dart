@@ -1,4 +1,5 @@
 import '../../packages_export.dart';
+import '../../providers/news_provider.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -26,6 +27,12 @@ class _HomeScreenState extends State<HomeScreen> {
   String selectedTab = 'All';
 
   @override
+  void initState() {
+    super.initState();
+    context.read<NewsProvider>().getAppNews(selectedTab, context);
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
@@ -40,8 +47,17 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Row(
                   children: tabs.asMap().entries.map(
                     (tab) {
-                      if (selectedTab == tab.value.toString()) {
-                        return Container(
+                      return GestureDetector(
+                        onTap: () => setState(() {
+                          if (selectedTab != tab.value.toString()) {
+                            selectedTab = tab.value.toString();
+                            context
+                                .read<NewsProvider>()
+                                .getAppNews(selectedTab, context);
+                          }
+                        }),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 800),
                           height: ScreenHelper.screenHeight(context) * 0.05,
                           width: ScreenHelper.screenWidth(context) * 0.30,
                           margin: EdgeInsets.symmetric(
@@ -51,7 +67,9 @@ class _HomeScreenState extends State<HomeScreen> {
                               ScreenHelper.screenWidth(context) * 0.01),
                           alignment: Alignment.center,
                           decoration: BoxDecoration(
-                            color: AppColors.primaryColor,
+                            color: selectedTab == tab.value.toString()
+                                ? AppColors.primaryColor
+                                : AppColors.secondaryColor.withOpacity(0.2),
                             borderRadius: BorderRadius.circular(
                                 ScreenHelper.screenHeight(context) * 0.025),
                           ),
@@ -64,65 +82,25 @@ class _HomeScreenState extends State<HomeScreen> {
                                     fontWeight: FontWeight.w600,
                                     color: AppColors.selectedTabTextColor),
                           ),
-                        );
-                      } else {
-                        return GestureDetector(
-                          onTap: () => setState(() {
-                            selectedTab = tab.value.toString();
-                          }),
-                          child: Container(
-                            height: ScreenHelper.screenHeight(context) * 0.05,
-                            width: ScreenHelper.screenWidth(context) * 0.30,
-                            margin: EdgeInsets.symmetric(
-                                horizontal:
-                                    ScreenHelper.screenWidth(context) * 0.01),
-                            padding: EdgeInsets.all(
-                                ScreenHelper.screenWidth(context) * 0.01),
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                              color: AppColors.secondaryColor.withOpacity(0.2),
-                              borderRadius: BorderRadius.circular(
-                                  ScreenHelper.screenHeight(context) * 0.025),
-                            ),
-                            child: Text(
-                              tab.value.toString(),
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyMedium
-                                  ?.copyWith(
-                                      fontWeight: FontWeight.w400,
-                                      color: AppColors.selectedTabTextColor),
-                            ),
-                          ),
-                        );
-                      }
+                        ),
+                      );
                     },
                   ).toList(),
                 ),
               ),
               SizedBox(height: ScreenHelper.screenHeight(context) * 0.02),
               Flexible(
-                child: FutureBuilder<List<News>>(
-                  future: NewsController().fetchData(selectedTab),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
+                child: Consumer<NewsProvider>(
+                  builder: (context, news, child) {
+                    if (news.isLoading == true) {
                       return const Center(
                         child: CircularProgressIndicator(),
                       );
-                    } else if (snapshot.hasError) {
-                      return Center(
-                        child: Text('Error: ${snapshot.error}'),
-                      );
-                    } else if (!snapshot.hasData) {
-                      return const Center(
-                        child: Text('No data available'),
-                      );
                     } else {
-                      // Data fetched successfully
                       return ListView.builder(
-                        itemCount: snapshot.data!.length,
+                        itemCount: news.appNews.length,
                         itemBuilder: (context, index) {
-                          final item = snapshot.data![index];
+                          final item = news.appNews[index];
                           return Card(
                             child: Padding(
                               padding: EdgeInsets.symmetric(
