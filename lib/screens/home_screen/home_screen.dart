@@ -1,3 +1,5 @@
+import 'package:news_application/constants/app_images.dart';
+
 import '../../packages_export.dart';
 import '../../providers/news_provider.dart';
 
@@ -111,7 +113,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               child: Column(
                                 children: [
                                   Image.network(item.urlToImage ??
-                                      'https://static.vecteezy.com/system/resources/thumbnails/004/141/669/small/no-photo-or-blank-image-icon-loading-images-or-missing-image-mark-image-not-available-or-image-coming-soon-sign-simple-nature-silhouette-in-frame-isolated-illustration-vector.jpg'),
+                                      AppImages.defaultNewsImage),
                                   ListTile(
                                     title: Text(
                                       item.title,
